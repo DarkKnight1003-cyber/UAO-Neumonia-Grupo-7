@@ -15,7 +15,6 @@ dependencies = [
     "pyautogui>=0.9.54",
     "pydicom>=3.0.2",
     "tensorflow>=2.21.0",
-    "tkcap>=0.0.4",
 ]
 
 [project.scripts]
