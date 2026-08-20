@@ -132,3 +132,8 @@ dmypy.json
 conv_MLP_84.h5
 WilhemNet86.h5
 *.h5
+
+# Archivos generados por la app en tiempo de ejecución
+historial.csv
+Reporte*.jpg
+Reporte*.pdf
