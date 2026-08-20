@@ -1,0 +1,26 @@
+[project]
+name = "uao-neumonia-grupo-7"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Juan Esteban Aristizabal", email = "aristizabalgarciaj22@gmail.com" }
+]
+requires-python = ">=3.13"
+dependencies = [
+    "img2pdf>=0.6.3",
+    "opencv-python>=5.0.0.93",
+    "pandas>=3.0.5",
+    "pillow>=12.3.0",
+    "pyautogui>=0.9.54",
+    "pydicom>=3.0.2",
+    "tensorflow>=2.21.0",
+    "tkcap>=0.0.4",
+]
+
+[project.scripts]
+uao-neumonia-grupo-7 = "uao_neumonia_grupo_7:main"
+
+[build-system]
+requires = ["uv_build>=0.12.2,<0.13.0"]
+build-backend = "uv_build"
