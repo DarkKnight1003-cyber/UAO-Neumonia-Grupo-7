@@ -1,25 +1,23 @@
 """Modulo encargado de orquestar el pipeline completo de prediccion."""
 
-import numpy as np
-
-from src.preprocess_img import preprocess
-from src.load_model import model_fun
 from src.grad_cam import grad_cam
 
 
 def predict(array):
-    """Orquesta el pipeline completo: preprocesa, predice la clase y genera el heatmap."""
-    batch_array_img = preprocess(array)
-    model = model_fun()
-    preds = model.predict(batch_array_img)
-    prediction = np.argmax(preds)
-    proba = np.max(preds) * 100
-    label = ""
-    if prediction == 0:
-        label = "bacteriana"
-    if prediction == 1:
-        label = "normal"
-    if prediction == 2:
-        label = "viral"
-    heatmap = grad_cam(array)
-    return (label, proba, heatmap)
+    """Ejecuta el pipeline completo de deteccion sobre una imagen.
+
+    Punto de entrada principal del sistema: recibe la imagen ya leida
+    (por read_dicom_file o read_jpg_file) y delega en grad_cam el
+    trabajo de preprocesarla, clasificarla y generar su mapa de calor.
+
+    Args:
+        array: arreglo NumPy de la imagen original, tal como la
+            devuelven read_dicom_file o read_jpg_file.
+
+    Returns:
+        Una tupla (label, proba, heatmap), tal como la retorna
+        grad_cam: la clase predicha, su probabilidad y la imagen
+        con el mapa de calor superpuesto.
+    """
+    label, proba, heatmap = grad_cam(array)
+    return label, proba, heatmap
