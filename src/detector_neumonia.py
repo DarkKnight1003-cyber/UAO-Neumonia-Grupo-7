@@ -13,7 +13,13 @@ from src.integrator import predict
 
 
 class App:
-    """Ventana principal de la aplicacion de deteccion de neumonia."""
+    """Ventana principal de la aplicacion de deteccion de neumonia.
+
+    Contiene todos los botones y campos con los que interactua el
+    usuario (cargar imagen, predecir, guardar resultados, generar PDF
+    y borrar), y delega todo el trabajo de lectura de imagenes y
+    prediccion en los modulos read_img.py e integrator.py.
+    """
 
     def __init__(self):
         self.root = Tk()
@@ -98,7 +104,14 @@ class App:
 
     #   METHODS
     def load_img_file(self):
-        """Abre el dialogo de seleccion de archivo y carga la imagen elegida."""
+        """Abre el dialogo de seleccion de archivo y carga la imagen elegida.
+
+        Detecta la extension del archivo seleccionado: si es .dcm usa
+        read_dicom_file, en cualquier otro caso (.jpg, .jpeg, .png) usa
+        read_jpg_file. La imagen cargada se guarda en self.array para
+        que run_model pueda usarla despues, y se muestra en el panel
+        izquierdo de la interfaz.
+        """
         filepath = filedialog.askopenfilename(
             initialdir="/",
             title="Select image",
@@ -120,7 +133,13 @@ class App:
             self.button1["state"] = "enabled"
 
     def run_model(self):
-        """Ejecuta la prediccion sobre la imagen cargada y muestra el resultado."""
+        """Ejecuta la prediccion sobre la imagen cargada y muestra el resultado.
+
+        Limpia los campos de resultado y probabilidad antes de insertar
+        los nuevos, para que no se acumulen con predicciones anteriores.
+        Llama a integrator.predict, que retorna la clase, la
+        probabilidad y el heatmap, y los muestra en la interfaz.
+        """
         self.text2.delete(1.0, "end")
         self.text3.delete(1.0, "end")
         self.label, self.proba, self.heatmap = predict(self.array)
@@ -141,7 +160,13 @@ class App:
             showinfo(title="Guardar", message="Los datos se guardaron con exito.")
 
     def create_pdf(self):
-        """Captura la ventana actual y genera un reporte en PDF."""
+        """Captura la ventana actual y genera un reporte en PDF.
+
+        Toma una captura de pantalla de la region exacta donde esta la
+        ventana (usando pyautogui) y la convierte a PDF. Cada reporte
+        generado incrementa self.reportID para no sobreescribir los
+        anteriores.
+        """
         ID = "Reporte" + str(self.reportID) + ".jpg"
         x = self.root.winfo_rootx()
         y = self.root.winfo_rooty()
