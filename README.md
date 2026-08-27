@@ -1,97 +1,190 @@
-## Hola! Bienvenido a la herramienta para la detección rápida de neumonía
+## Detección de Neumonía mediante Deep Learning
 
-Deep Learning aplicado en el procesamiento de imágenes radiográficas de tórax en formato DICOM con el fin de clasificarlas en 3 categorías diferentes:
+Aplicación diseñada para analizar radiografías torácicas a través de técnicas de aprendizaje profundo, con la finalidad de ayudar en la categorización de imágenes en tres grupos:
 
-1. Neumonía Bacteriana
+Neumonía de origen bacteriano.
+Neumonía de origen viral.
+Sin presencia de neumonía.
 
-2. Neumonía Viral
+El sistema posibilita que se suban y muestren imágenes de radiográficas en los formatos PNG, JPG, JPEG y DICOM. Después, las imágenes se preprocesan a través de una serie de pasos: se les cambia el tamaño a 512 × 512 píxeles, se convierten a escala de grises, se les aplica ecualización adaptativa usando CLAHE y finalmente se normalizan sus valores en un rango entre 0 y 1. Una vez que se finaliza este procedimiento, una red neuronal convolucional (CNN) examina la imagen y produce una predicción junto con la probabilidad vinculada a la clase detectada.
 
-3. Sin Neumonía
-
-Aplicación de una técnica de explicación llamada Grad-CAM para resaltar con un mapa de calor las regiones relevantes de la imagen de entrada.
-
+Asimismo, la aplicación incluye el uso de Grad-CAM para crear mapas de calor, que destacan las áreas de la radiografía que tuvieron más impacto en la categorización hecha por el modelo.
 ---
+## Objetivo
+Integrar técnicas de aprendizaje profundo y tratamiento de imágenes en una aplicación modular, que se pueda mantener y reproducir, para la categorización de radiografías torácicas.
 
-## Uso de la herramienta:
+El proyecto organiza cada función en módulos independientes y asegura que cada uno de ellos asuma una tarea concreta, evitando así la excesiva dependencia entre ellos.
 
-A continuación le explicaremos cómo empezar a utilizarla.
+## Funcionalidades
+Se pueden documentar funcionalidades como:
 
-Requerimientos necesarios para el funcionamiento:
+- Carga de imágenes radiográficas.
+- Lectura de imágenes en formato DICOM.
+- Lectura de imágenes JPG, JPEG y PNG.
+- Visualización de la imagen cargada.
+- Preprocesamiento de imágenes a una resolución de 512 × 512 píxeles.
+- Conversión a escala de grises.
+- Aplicación de CLAHE.
+- Normalización de la imagen.
+- Predicción mediante un modelo de aprendizaje profundo.
+- Clasificación en neumonía bacteriana, neumonía viral o sin neumonía.
+- Generación de mapas de calor mediante Grad-CAM.
+- Visualización de la clase predicha y su probabilidad.
+- Registro de resultados.
 
-- Instale Anaconda para Windows siguiendo las siguientes instrucciones:
-  https://docs.anaconda.com/anaconda/install/windows/
+### Estructura y módulos del proyecto
+La arquitectura del sistema se diseñó con un enfoque modular. Esto es decir, en términos de diseño, cada archivo tiene una única y bien delimitada finalidad, evitando mezclar distintas lógicas o funciones en un mismo lugar.
 
-- Abra Anaconda Prompt y ejecute las siguientes instrucciones:
+```text
+UAO-Neumonia-Grupo-7/
 
-  conda create -n tf tensorflow
+─ src/
+ ─ detector_neumonia.py
+ ─ integrator.py
+ ─ read_img.py
+ ─ preprocess_img.py
+ ─ load_model.py
+ ─ grad_cam.py
 
-  conda activate tf
+─ test/
+  ─ test_detector_neumonia.py
+  ─ test_grad_cam.py
+  ─ test_integrator.py
+  ─ test_load_model.py
+  ─ test_preprocess_img.py
+  ─ test_read_img.py
 
-  cd UAO-Neumonia
+─ DICOM/
+ ─ JPG/
+ ─ assets/
+   ─ flujo_datos.png
 
-  pip install -r requirements.txt
+─ Dockerfile
+─ pyproject.toml
+─ uv.lock
+─ .gitignore
+─ LICENSE
+─ README.md
+```
 
-  python detector_neumonia.py
+| Módulo | Responsabilidad |
+| --- | --- |
+| `detector_neumonia.py` | Contiene el diseño de la interfaz gráfica utilizando Tkinter. Los botones llaman métodos contenidos en los demás módulos del sistema. |
 
-Uso de la Interfaz Gráfica:
+| `integrator.py` | Integra los demás módulos y retorna solamente la información necesaria para ser visualizada en la interfaz gráfica: la clase, la probabilidad y la imagen del mapa de calor generado por Grad-CAM. |
 
-- Ingrese la cédula del paciente en la caja de texto
-- Presione el botón 'Cargar Imagen', seleccione la imagen del explorador de archivos del computador (Imagenes de prueba en https://drive.google.com/drive/folders/1WOuL0wdVC6aojy8IfssHcqZ4Up14dy0g?usp=drive_link)
-- Presione el botón 'Predecir' y espere unos segundos hasta que observe los resultados
-- Presione el botón 'Guardar' para almacenar la información del paciente en un archivo excel con extensión .csv
-- Presione el botón 'PDF' para descargar un archivo PDF con la información desplegada en la interfaz
-- Presión el botón 'Borrar' si desea cargar una nueva imagen
+| `read_img.py` | Lee las imágenes radiográficas para visualizarlas en la interfaz gráfica. Además, convierte la imagen a un arreglo para que pueda ser enviada al módulo de preprocesamiento. |
 
----
+| `preprocess_img.py` | Recibe el arreglo proveniente de `read_img.py` y realiza el redimensionamiento a 512 × 512 píxeles, la conversión a escala de grises, la ecualización mediante CLAHE, la normalización entre 0 y 1 y la conversión del arreglo al formato de batch utilizado por el modelo. |
 
-## Arquitectura de archivos propuesta.
+| `load_model.py` | Lee y carga el archivo binario del modelo de red neuronal convolucional previamente entrenado que será utilizado para realizar las predicciones. |
 
-## detector_neumonia.py
+| `grad_cam.py` | Recibe la imagen procesada, utiliza el modelo para obtener la predicción y analiza la capa convolucional de interés para generar un mapa de calor Grad-CAM con las características relevantes de la imagen. |
 
-Contiene el diseño de la interfaz gráfica utilizando Tkinter.
+## Flujo de datos
+![Flujo de datos del sistema](assets/flujo_datos.png)
 
-Los botones llaman métodos contenidos en otros scripts.
+## Requisitos
+Para la ejecución local del proyecto se requiere: 
+- Python 3.13 o superior. 
+- Git. 
+- `uv` como gestor del entorno y las dependencias. 
+- El archivo `conv_MLP_84.h5`. 
 
-## integrator.py
+Las dependencias de Python utilizadas por el proyecto se encuentran definidas en `pyproject.toml` y `uv.lock`
 
-Es un módulo que integra los demás scripts y retorna solamente lo necesario para ser visualizado en la interfaz gráfica.
-Retorna la clase, la probabilidad y una imagen el mapa de calor generado por Grad-CAM.
+## Tecnologías usadas
+Entre las principales dependencias utilizadas se encuentran: 
 
-## read_img.py
+| Tecnología | Uso dentro del proyecto |
+| --- | --- |
 
-Script que lee la imagen en formato DICOM para visualizarla en la interfaz gráfica. Además, la convierte a arreglo para su preprocesamiento.
+| **Python 3.13.7** | Lenguaje principal utilizado para el desarrollo y ejecución de la aplicación. |
 
-## preprocess_img.py
+| **TensorFlow / Keras** | Carga y ejecución del modelo de red neuronal convolucional utilizado para la clasificación de radiografías. |
 
-Script que recibe el arreglo proveniento de read_img.py, realiza las siguientes modificaciones:
+| **OpenCV** | Procesamiento de imágenes, conversión a escala de grises, redimensionamiento y generación del mapa de calor. |
 
-- resize a 512x512
-- conversión a escala de grises
-- ecualización del histograma con CLAHE
-- normalización de la imagen entre 0 y 1
-- conversión del arreglo de imagen a formato de batch (tensor)
+| **NumPy** | Manejo y transformación de arreglos numéricos correspondientes a las imágenes. |
 
-## load_model.py
+| **pydicom** | Lectura y procesamiento de imágenes médicas en formato DICOM. |
 
-Script que lee el archivo binario del modelo de red neuronal convolucional previamente entrenado llamado 'WilhemNet86.h5'.
+| **Pillow** | Manejo y visualización de imágenes dentro de la aplicación. |
 
-## grad_cam.py
+| **Tkinter** | Desarrollo de la interfaz gráfica de usuario. |
 
-Script que recibe la imagen y la procesa, carga el modelo, obtiene la predicción y la capa convolucional de interés para obtener las características relevantes de la imagen.
+| **pandas** | Manejo y almacenamiento de información asociada a los resultados del sistema. |
 
----
+| **PyAutoGUI** | Apoyo en la generación y captura de información utilizada en los reportes. |
+
+| **img2pdf** | Conversión de imágenes para la generación de documentos PDF. |
+
+| **Grad-CAM** | Técnica utilizada para generar mapas de calor que resaltan las regiones relevantes para la clasificación. |
+
+| **pytest** | Ejecución de las pruebas unitarias del proyecto. |
+
+| **uv** | Gestión del entorno virtual y de las dependencias del proyecto. |
+
+| **Git y GitHub** | Control de versiones y trabajo colaborativo. |
+
+| **Docker** | Creación de un entorno de ejecución reproducible mediante contenedores. |
+
+## Instalación
+### 1. Clonar el repositorio
+git clone <https://github.com/DarkKnight1003-cyber/UAO-Neumonia-Grupo-7.git>
+
+Ingresar al proyecto:
+
+cd UAO-Neumonia-Grupo-7
+
+### 2. Instalar las dependencias
+
+El proyecto fue desarrollado y validado utilizando **Python 3.13.7** y utiliza `uv` para la gestión del entorno virtual y las dependencias.
+
+Las dependencias necesarias se encuentran definidas en `pyproject.toml`, mientras que `uv.lock` mantiene las versiones utilizadas por el proyecto para garantizar una instalación reproducible.
+
+Desde la raiz (en un terminal) del proyecto ejecutar:
+
+uv sync --python 3.13.7 --frozen --no-install-project
 
 ## Acerca del Modelo
 
-La red neuronal convolucional implementada (CNN) es basada en el modelo implementado por F. Pasa, V.Golkov, F. Pfeifer, D. Cremers & D. Pfeifer
-en su artículo Efcient Deep Network Architectures for Fast Chest X-Ray Tuberculosis Screening and Visualization.
+El sistema utiliza un modelo de red neuronal convolucional previamente entrenado almacenado en el archivo `conv_MLP_84.h5`.
 
-Está compuesta por 5 bloques convolucionales, cada uno contiene 3 convoluciones; dos secuenciales y una conexión 'skip' que evita el desvanecimiento del gradiente a medida que se avanza en profundidad.
-Con 16, 32, 48, 64 y 80 filtros de 3x3 para cada bloque respectivamente.
+Este modelo es utilizado para realizar la clasificación de las radiografías de tórax en tres categorías:
 
-Después de cada bloque convolucional se encuentra una capa de max pooling y después de la última una capa de Average Pooling seguida por tres capas fully-connected (Dense) de 1024, 1024 y 3 neuronas respectivamente.
+- Neumonía bacteriana.
+- Neumonía viral.
+- Sin neumonía.
 
-Para regularizar el modelo utilizamos 3 capas de Dropout al 20%; dos en los bloques 4 y 5 conv y otra después de la 1ra capa Dense.
+El módulo `load_model.py` se encarga de cargar el archivo del modelo para que pueda ser utilizado durante el proceso de predicción.
+
+El archivo `conv_MLP_84.h5` no se almacena directamente en el repositorio debido a que se encuentra excluido mediante `.gitignore`.
+
+Para la ejecución local, el archivo debe ubicarse en la raíz del proyecto:
+
+UAO-Neumonia-Grupo-7/
+│
+├── conv_MLP_84.h5
+├── src/
+├── Dockerfile
+├── pyproject.toml
+├── uv.lock
+└── README.md
+
+El archivo `conv_MLP_84.h5` no se incluye en el repositorio ni dentro de la imagen Docker. Para la ejecución local debe ubicarse en la raíz del proyecto y, para Docker, se monta como un volumen de solo lectura.
+
+## Uso de la aplicación
+ 1. Ingresar la identificación solicitada por la aplicación. 
+ 2. Presionar el botón para cargar una radiografía. 
+ 3. Seleccionar una imagen compatible. 
+ 4. Verificar que la imagen sea mostrada en la interfaz. 
+ 5. Presionar el botón **Predecir**. 
+ 6. Visualizar la clase obtenida. 
+ 7. Visualizar la probabilidad asociada. 
+ 8. Consultar el mapa de calor generado mediante Grad-CAM. 
+ 9. Guardar o generar el reporte correspondiente, cuando sea necesario. 
+ 10. Utilizar la opción de borrado para comenzar un nuevo análisis.
 
 ## Acerca de Grad-CAM
 
@@ -100,6 +193,33 @@ Es una técnica utilizada para resaltar las regiones de una imagen que son impor
 Grad-CAM realiza el cálculo del gradiente de la salida correspondiente a la clase a visualizar con respecto a las neuronas de una cierta capa de la CNN. Esto permite tener información de la importancia de cada neurona en el proceso de decisión de esa clase en particular. Una vez obtenidos estos pesos, se realiza una combinación lineal entre el mapa de activaciones de la capa y los pesos, de esta manera, se captura la importancia del mapa de activaciones para la clase en particular y se ve reflejado en la imagen de entrada como un mapa de calor con intensidades más altas en aquellas regiones relevantes para la red con las que clasificó la imagen en cierta categoría.
 
 ## Proyecto original realizado por:
-
 Isabella Torres Revelo - https://github.com/isa-tr
 Nicolas Diaz Salazar - https://github.com/nicolasdiazsalazar
+
+## Adaptación académica Grupo 7: 
+- Felipe Lopez Toro. 
+- John Posso Sepúlveda. 
+- Juan Esteban. 
+- Marc A.
+
+## Licencia
+Este proyecto se distribuye bajo la **Licencia MIT**, permitiendo su uso, modificación y distribución bajo los términos establecidos por dicha licencia.
+
+Para consultar los términos completos, consulte el archivo [`LICENSE`](LICENSE).
+
+## Dockerización
+El proyecto puede ejecutarse dentro de un contenedor Docker utilizando Python 3.13 y `uv` como gestor de dependencias.
+
+## Requisitos para docker
+Antes de ejecutar el proyecto mediante Docker se requiere:
+- Docker Desktop. 
+- WSL 2 en Windows. 
+- VcXsrv o un servidor X equivalente para visualizar la interfaz gráfica desarrollada con Tkinter. 
+- El archivo `conv_MLP_84.h5` ubicado en la raíz del proyecto.
+
+**Nota:** El modelo `conv_MLP_84.h5` no se encuentra almacenado en el repositorio debido a que está excluido mediante `.gitignore`. Tampoco se incluye dentro de la imagen Docker. Para ejecutar las predicciones, debe montarse en el contenedor como un volumen de solo lectura.
+
+## Construcción de la imagen
+Desde la raíz del proyecto ejecutar: 
+(desde powershell) 
+docker build -t uao-neumonia-grupo-7
