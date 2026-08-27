@@ -1,5 +1,12 @@
 ## Detección de Neumonía mediante Deep Learning
 
+![Python](https://img.shields.io/badge/Python-3.13.7-blue)
+![uv](https://img.shields.io/badge/uv-package%20manager-purple)
+![TensorFlow](https://img.shields.io/badge/TensorFlow-2.21%2B-orange)
+![pytest](https://img.shields.io/badge/pytest-9.1.1%2B-green)
+![Docker](https://img.shields.io/badge/Docker-enabled-blue)
+![License](https://img.shields.io/badge/License-MIT-green)
+
 Aplicación diseñada para analizar radiografías torácicas a través de técnicas de aprendizaje profundo, con la finalidad de ayudar en la categorización de imágenes en tres grupos:
 
 Neumonía de origen bacteriano.
@@ -186,6 +193,15 @@ El archivo `conv_MLP_84.h5` no se incluye en el repositorio ni dentro de la imag
  9. Guardar o generar el reporte correspondiente, cuando sea necesario. 
  10. Utilizar la opción de borrado para comenzar un nuevo análisis.
 
+## Pruebas unitarias
+
+El proyecto incluye pruebas unitarias desarrolladas con `pytest`, ubicadas en la carpeta `test/`.
+
+Para ejecutar las pruebas desde la raíz del proyecto en PowerShell, primero se debe indicar la ubicación de los módulos contenidos en `src/`:
+
+```powershell
+$env:PYTHONPATH="$PWD\src"
+```
 ## Acerca de Grad-CAM
 
 Es una técnica utilizada para resaltar las regiones de una imagen que son importantes para la clasificación. Un mapeo de activaciones de clase para una categoría en particular indica las regiones de imagen relevantes utilizadas por la CNN para identificar esa categoría.
@@ -199,8 +215,8 @@ Nicolas Diaz Salazar - https://github.com/nicolasdiazsalazar
 ## Adaptación académica Grupo 7: 
 - Felipe Lopez Toro. 
 - John Posso Sepúlveda. 
-- Juan Esteban. 
-- Marc A.
+- Juan Esteban Aristizabal. 
+- Marco Antonio Aragón Vivas.
 
 ## Licencia
 Este proyecto se distribuye bajo la **Licencia MIT**, permitiendo su uso, modificación y distribución bajo los términos establecidos por dicha licencia.
@@ -225,3 +241,31 @@ docker run --rm uao-neumonia-grupo-7
 Desde la raíz del proyecto ejecutar: 
 (desde powershell) 
 docker build -t uao-neumonia-grupo-7
+
+### Ejecución del contenedor
+
+Antes de ejecutar el contenedor, asegúrese de que **Docker Desktop** y **XLaunch/VcXsrv** se encuentren activos.
+
+Desde la terminal, ubicado en la raíz del proyecto, ejecutar:
+
+```powershell
+docker run --rm `
+  -e DISPLAY=host.docker.internal:0.0 `
+  -v "${PWD}\conv_MLP_84.h5:/app/conv_MLP_84.h5:ro" `
+  uao-neumonia-grupo-7
+```
+
+```text
+DISPLAY=host.docker.internal:0.0
+```
+
+permite que la interfaz gráfica desarrollada con Tkinter pueda visualizarse en Windows mediante VcXsrv/XLaunch.
+
+El volumen:
+
+```text
+${PWD}\conv_MLP_84.h5:/app/conv_MLP_84.h5:ro
+```
+
+monta el archivo `conv_MLP_84.h5` desde la raíz del proyecto hacia el directorio `/app` del contenedor.
+
