@@ -181,6 +181,12 @@ UAO-Neumonia-Grupo-7/
 
 El archivo `conv_MLP_84.h5` no se incluye en el repositorio ni dentro de la imagen Docker. Para la ejecución local debe ubicarse en la raíz del proyecto y, para Docker, se monta como un volumen de solo lectura.
 
+## Ejecución local
+
+Con el entorno ya instalado, para abrir la aplicación desde la raíz del proyecto:
+
+uv run python -m src.detector_neumonia
+
 ## Uso de la aplicación
  1. Ingresar la identificación solicitada por la aplicación. 
  2. Presionar el botón para cargar una radiografía. 
@@ -197,11 +203,10 @@ El archivo `conv_MLP_84.h5` no se incluye en el repositorio ni dentro de la imag
 
 El proyecto incluye pruebas unitarias desarrolladas con `pytest`, ubicadas en la carpeta `test/`.
 
-Para ejecutar las pruebas desde la raíz del proyecto en PowerShell, primero se debe indicar la ubicación de los módulos contenidos en `src/`:
+Para ejecutar las pruebas unitarias desde la raiz del proyecto: 
 
-```powershell
-$env:PYTHONPATH="$PWD\src"
-```
+uv run python -m pytest -q test
+
 ## Acerca de Grad-CAM
 
 Es una técnica utilizada para resaltar las regiones de una imagen que son importantes para la clasificación. Un mapeo de activaciones de clase para una categoría en particular indica las regiones de imagen relevantes utilizadas por la CNN para identificar esa categoría.
