@@ -152,7 +152,7 @@ class App:
 
     def save_results_csv(self):
         """Guarda la cedula, el resultado y la probabilidad en historial.csv."""
-        with open("historial.csv", "a") as csvfile:
+        with open("historial.csv", "a", newline="") as csvfile:
             w = csv.writer(csvfile, delimiter="-")
             w.writerow(
                 [self.text1.get(), self.label, "{:.2f}".format(self.proba) + "%"]
