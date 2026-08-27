@@ -216,6 +216,8 @@ Antes de ejecutar el proyecto mediante Docker se requiere:
 - WSL 2 en Windows. 
 - VcXsrv o un servidor X equivalente para visualizar la interfaz gráfica desarrollada con Tkinter. 
 - El archivo `conv_MLP_84.h5` ubicado en la raíz del proyecto.
+- ```powershell
+docker run --rm uao-neumonia-grupo-7
 
 **Nota:** El modelo `conv_MLP_84.h5` no se encuentra almacenado en el repositorio debido a que está excluido mediante `.gitignore`. Tampoco se incluye dentro de la imagen Docker. Para ejecutar las predicciones, debe montarse en el contenedor como un volumen de solo lectura.
 
