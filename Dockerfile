@@ -18,6 +18,9 @@ COPY pyproject.toml uv.lock README.md ./
 # Instalar dependencias Python con UV
 RUN uv sync --frozen --no-dev --no-install-project
 
+# Instalar gnome-screenshot para capturas de pantalla
+RUN apt update && apt install -y gnome-screenshot
+
 # Copiar código fuente
 COPY src ./src
 
@@ -32,3 +35,4 @@ ENV DISPLAY=host.docker.internal:0.0
 
 # Ejecutar la aplicación
 CMD ["python", "-m", "src.detector_neumonia"]
+
