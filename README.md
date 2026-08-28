@@ -110,22 +110,53 @@ Las dependencias de Python utilizadas por el proyecto se encuentran definidas en
 | **Docker** | Creación de un entorno de ejecución reproducible mediante contenedores. |
 
 ## Instalación
+
+### Requisitos previos
+
+- Python 3.13 o superior.
+- Git.
+- `uv` instalado en el sistema. Si no lo tienes, instálalo con:
+
+```powershell
+powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
+```
+
 ### 1. Clonar el repositorio
-git clone <https://github.com/DarkKnight1003-cyber/UAO-Neumonia-Grupo-7.git>
 
-Ingresar al proyecto:
-
+```powershell
+git clone https://github.com/DarkKnight1003-cyber/UAO-Neumonia-Grupo-7.git
 cd UAO-Neumonia-Grupo-7
+```
 
 ### 2. Instalar las dependencias
 
-El proyecto fue desarrollado y validado utilizando **Python 3.13.7** y utiliza `uv` para la gestión del entorno virtual y las dependencias.
+El proyecto fue desarrollado y validado utilizando **Python 3.13.7** y utiliza `uv` para la gestión del entorno virtual y las dependencias. Las dependencias necesarias se encuentran definidas en `pyproject.toml`, mientras que `uv.lock` mantiene las versiones utilizadas por el proyecto para garantizar una instalación reproducible.
 
-Las dependencias necesarias se encuentran definidas en `pyproject.toml`, mientras que `uv.lock` mantiene las versiones utilizadas por el proyecto para garantizar una instalación reproducible.
+Desde la raíz del proyecto, ejecutar:
 
-Desde la raiz (en un terminal) del proyecto ejecutar:
-
+```powershell
 uv sync --python 3.13.7 --frozen --no-install-project
+```
+
+### 3. Verificar la instalación
+
+```powershell
+uv run python --version
+```
+
+Debería mostrar `Python 3.13.7`.
+
+### 4. Colocar el modelo entrenado
+
+Copiar el archivo `conv_MLP_84.h5` (no incluido en el repositorio, ver sección "Acerca del Modelo") en la raíz del proyecto.
+
+### 5. Ejecutar la aplicación
+
+```powershell
+uv run python -m src.detector_neumonia
+```
+
+Para correr las pruebas unitarias o usar Docker, consulte las secciones "Pruebas unitarias" y "Dockerización" más abajo.
 
 ## Acerca del Modelo
 
