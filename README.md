@@ -44,48 +44,39 @@ La arquitectura del sistema se diseñó con un enfoque modular. Esto es decir, e
 
 ```text
 UAO-Neumonia-Grupo-7/
-
-─ src/
- ─ detector_neumonia.py
- ─ integrator.py
- ─ read_img.py
- ─ preprocess_img.py
- ─ load_model.py
- ─ grad_cam.py
-
-─ test/
-  ─ test_detector_neumonia.py
-  ─ test_grad_cam.py
-  ─ test_integrator.py
-  ─ test_load_model.py
-  ─ test_preprocess_img.py
-  ─ test_read_img.py
-
-─ DICOM/
- ─ JPG/
- ─ assets/
-   ─ flujo_datos.png
-
-─ Dockerfile
-─ pyproject.toml
-─ uv.lock
-─ .gitignore
-─ LICENSE
-─ README.md
+├── src/
+│   ├── detector_neumonia.py
+│   ├── integrator.py
+│   ├── read_img.py
+│   ├── preprocess_img.py
+│   ├── load_model.py
+│   └── grad_cam.py
+├── test/
+│   ├── test_detector_neumonia.py
+│   ├── test_grad_cam.py
+│   ├── test_integrator.py
+│   ├── test_load_model.py
+│   ├── test_preprocess_img.py
+│   └── test_read_img.py
+├── DICOM/
+├── JPG/
+├── assets/
+│   └── flujo_datos.png
+├── Dockerfile
+├── pyproject.toml
+├── uv.lock
+├── .gitignore
+├── LICENSE
+└── README.md
 ```
 
 | Módulo | Responsabilidad |
 | --- | --- |
 | `detector_neumonia.py` | Contiene el diseño de la interfaz gráfica utilizando Tkinter. Los botones llaman métodos contenidos en los demás módulos del sistema. |
-
 | `integrator.py` | Integra los demás módulos y retorna solamente la información necesaria para ser visualizada en la interfaz gráfica: la clase, la probabilidad y la imagen del mapa de calor generado por Grad-CAM. |
-
 | `read_img.py` | Lee las imágenes radiográficas para visualizarlas en la interfaz gráfica. Además, convierte la imagen a un arreglo para que pueda ser enviada al módulo de preprocesamiento. |
-
 | `preprocess_img.py` | Recibe el arreglo proveniente de `read_img.py` y realiza el redimensionamiento a 512 × 512 píxeles, la conversión a escala de grises, la ecualización mediante CLAHE, la normalización entre 0 y 1 y la conversión del arreglo al formato de batch utilizado por el modelo. |
-
 | `load_model.py` | Lee y carga el archivo binario del modelo de red neuronal convolucional previamente entrenado que será utilizado para realizar las predicciones. |
-
 | `grad_cam.py` | Recibe la imagen procesada, utiliza el modelo para obtener la predicción y analiza la capa convolucional de interés para generar un mapa de calor Grad-CAM con las características relevantes de la imagen. |
 
 ## Flujo de datos
@@ -100,40 +91,22 @@ Para la ejecución local del proyecto se requiere:
 
 Las dependencias de Python utilizadas por el proyecto se encuentran definidas en `pyproject.toml` y `uv.lock`
 
-## Tecnologías usadas
-Entre las principales dependencias utilizadas se encuentran: 
-
 | Tecnología | Uso dentro del proyecto |
 | --- | --- |
-
 | **Python 3.13.7** | Lenguaje principal utilizado para el desarrollo y ejecución de la aplicación. |
-
 | **TensorFlow / Keras** | Carga y ejecución del modelo de red neuronal convolucional utilizado para la clasificación de radiografías. |
-
 | **OpenCV** | Procesamiento de imágenes, conversión a escala de grises, redimensionamiento y generación del mapa de calor. |
-
 | **NumPy** | Manejo y transformación de arreglos numéricos correspondientes a las imágenes. |
-
 | **pydicom** | Lectura y procesamiento de imágenes médicas en formato DICOM. |
-
 | **Pillow** | Manejo y visualización de imágenes dentro de la aplicación. |
-
 | **Tkinter** | Desarrollo de la interfaz gráfica de usuario. |
-
 | **pandas** | Manejo y almacenamiento de información asociada a los resultados del sistema. |
-
 | **PyAutoGUI** | Apoyo en la generación y captura de información utilizada en los reportes. |
-
 | **img2pdf** | Conversión de imágenes para la generación de documentos PDF. |
-
 | **Grad-CAM** | Técnica utilizada para generar mapas de calor que resaltan las regiones relevantes para la clasificación. |
-
 | **pytest** | Ejecución de las pruebas unitarias del proyecto. |
-
 | **uv** | Gestión del entorno virtual y de las dependencias del proyecto. |
-
 | **Git y GitHub** | Control de versiones y trabajo colaborativo. |
-
 | **Docker** | Creación de un entorno de ejecución reproducible mediante contenedores. |
 
 ## Instalación
@@ -170,14 +143,15 @@ El archivo `conv_MLP_84.h5` no se almacena directamente en el repositorio debido
 
 Para la ejecución local, el archivo debe ubicarse en la raíz del proyecto:
 
+```text
 UAO-Neumonia-Grupo-7/
-│
 ├── conv_MLP_84.h5
 ├── src/
 ├── Dockerfile
 ├── pyproject.toml
 ├── uv.lock
 └── README.md
+```
 
 El archivo `conv_MLP_84.h5` no se incluye en el repositorio ni dentro de la imagen Docker. Para la ejecución local debe ubicarse en la raíz del proyecto y, para Docker, se monta como un volumen de solo lectura.
 
@@ -237,8 +211,10 @@ Antes de ejecutar el proyecto mediante Docker se requiere:
 - WSL 2 en Windows. 
 - VcXsrv o un servidor X equivalente para visualizar la interfaz gráfica desarrollada con Tkinter. 
 - El archivo `conv_MLP_84.h5` ubicado en la raíz del proyecto.
-- ```powershell
+
+```powershell
 docker run --rm uao-neumonia-grupo-7
+```
 
 **Nota:** El modelo `conv_MLP_84.h5` no se encuentra almacenado en el repositorio debido a que está excluido mediante `.gitignore`. Tampoco se incluye dentro de la imagen Docker. Para ejecutar las predicciones, debe montarse en el contenedor como un volumen de solo lectura.
 
