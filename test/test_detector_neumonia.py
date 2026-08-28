@@ -1,3 +1,5 @@
+"""Pruebas unitarias para el modulo detector_neumonia (interfaz grafica Tkinter)."""
+
 import csv
 from pathlib import Path
 from typing import Any
@@ -10,6 +12,8 @@ import detector_neumonia
 
 
 class _Widget:
+    """Widget falso que simula el comportamiento minimo de un widget de Tkinter."""
+
     def __init__(self, value=""):
         self.value = value
         self.deleted = []
@@ -36,6 +40,12 @@ class _Widget:
 
 
 def _app_without_init():
+    """Crea una instancia de App sin ejecutar su __init__ (evita abrir Tkinter real).
+
+    Returns:
+        Una instancia de App con widgets falsos (_Widget) en lugar de
+        los reales, lista para probar sus metodos de forma aislada.
+    """
     app: Any = detector_neumonia.App.__new__(detector_neumonia.App)
     app.text1 = _Widget("123")
     app.text2 = _Widget()
@@ -51,6 +61,14 @@ def _app_without_init():
 
 @pytest.mark.parametrize("extension", [".dcm", ".jpg", ".jpeg", ".png"])
 def test_app_load_img_file_selects_reader_and_enables_prediction(monkeypatch, extension):
+    """Verifica que load_img_file elija el lector correcto segun la extension del archivo.
+
+    Args:
+        monkeypatch: fixture de pytest para simular el dialogo de
+            archivo y las funciones de lectura de imagen.
+        extension: extension del archivo simulado (parametrizada).
+    """
+    # Arrange
     app = _app_without_init()
     image = Image.new("RGB", (4, 4), "white")
     loaded = np.ones((4, 4, 3), dtype=np.uint8)
@@ -59,7 +77,11 @@ def test_app_load_img_file_selects_reader_and_enables_prediction(monkeypatch, ex
     monkeypatch.setattr(detector_neumonia, "read_dicom_file", lambda path: calls.append("dcm") or (loaded, image))
     monkeypatch.setattr(detector_neumonia, "read_jpg_file", lambda path: calls.append("jpg") or (loaded, image))
     monkeypatch.setattr(detector_neumonia.ImageTk, "PhotoImage", lambda value: value)
+
+    # Act
     app.load_img_file()
+
+    # Assert
     assert app.array is loaded
     assert calls == (["dcm"] if extension.lower() == ".dcm" else ["jpg"])
     assert app.button1.state == "enabled"
@@ -67,12 +89,23 @@ def test_app_load_img_file_selects_reader_and_enables_prediction(monkeypatch, ex
 
 @pytest.mark.parametrize("prediction", [("bacteriana", 12.345), ("normal", 50.0), ("viral", 99.999), ("normal", 0.0)])
 def test_app_run_model_clears_and_displays_prediction(monkeypatch, prediction):
+    """Verifica que run_model limpie los campos previos y muestre la nueva prediccion.
+
+    Args:
+        monkeypatch: fixture de pytest para simular integrator.predict.
+        prediction: tupla (label, proba) de prueba (parametrizada).
+    """
+    # Arrange
     app = _app_without_init()
     app.img1 = object()
     heatmap = np.zeros((4, 4, 3), dtype=np.uint8)
     monkeypatch.setattr(detector_neumonia, "predict", lambda _: (prediction[0], prediction[1], heatmap))
     monkeypatch.setattr(detector_neumonia.ImageTk, "PhotoImage", lambda value: value)
+
+    # Act
     app.run_model()
+
+    # Assert
     assert app.text2.value == prediction[0]
     assert app.text3.value == f"{prediction[1]:.2f}%"
     assert app.text2.deleted and app.text3.deleted
@@ -81,13 +114,26 @@ def test_app_run_model_clears_and_displays_prediction(monkeypatch, prediction):
 
 @pytest.mark.parametrize("label,proba", [("bacteriana", 1.0), ("normal", 25.5), ("viral", 99.0), ("normal", 50.25)])
 def test_app_save_results_csv_writes_delimited_history(monkeypatch, tmp_path, label, proba):
+    """Verifica que save_results_csv escriba correctamente el historial en historial.csv.
+
+    Args:
+        monkeypatch: fixture de pytest para simular showinfo.
+        tmp_path: fixture de pytest, carpeta temporal para el archivo csv.
+        label: clase de prueba a guardar (parametrizada).
+        proba: probabilidad de prueba a guardar (parametrizada).
+    """
+    # Arrange
     app = _app_without_init()
     app.label = label
     app.proba = proba
     messages = []
     monkeypatch.chdir(tmp_path)
     monkeypatch.setattr(detector_neumonia, "showinfo", lambda **kwargs: messages.append(kwargs))
+
+    # Act
     app.save_results_csv()
+
+    # Assert
     with Path("historial.csv").open(newline="") as csvfile:
         rows = list(csv.reader(csvfile, delimiter="-"))
     assert rows == [["123", label, f"{proba:.2f}%"]]
@@ -96,13 +142,24 @@ def test_app_save_results_csv_writes_delimited_history(monkeypatch, tmp_path, la
 
 @pytest.mark.parametrize("confirmed", [True, False, True, False])
 def test_app_delete_respects_confirmation(monkeypatch, confirmed):
+    """Verifica que delete solo borre los datos si el usuario confirma la accion.
+
+    Args:
+        monkeypatch: fixture de pytest para simular askokcancel y showinfo.
+        confirmed: si el usuario confirma o cancela (parametrizada).
+    """
+    # Arrange
     app = _app_without_init()
     app.img1 = object()
     app.img2 = object()
     messages = []
     monkeypatch.setattr(detector_neumonia, "askokcancel", lambda **_: confirmed)
     monkeypatch.setattr(detector_neumonia, "showinfo", lambda **kwargs: messages.append(kwargs))
+
+    # Act
     app.delete()
+
+    # Assert
     if confirmed:
         assert app.text1.deleted and app.text2.deleted and app.text3.deleted
         assert app.text_img1.deleted and app.text_img2.deleted
@@ -114,6 +171,14 @@ def test_app_delete_respects_confirmation(monkeypatch, confirmed):
 
 @pytest.mark.parametrize("report_id", [0, 1, 7, 19])
 def test_app_create_pdf_captures_unique_report(monkeypatch, tmp_path, report_id):
+    """Verifica que create_pdf capture pantalla y genere un reporte con ID unico.
+
+    Args:
+        monkeypatch: fixture de pytest para simular pyautogui, Image y showinfo.
+        tmp_path: fixture de pytest, carpeta temporal para los archivos generados.
+        report_id: identificador de reporte de prueba (parametrizado).
+    """
+    # Arrange
     app = _app_without_init()
     app.reportID = report_id
     app.root.winfo_rootx = lambda: 1
@@ -131,6 +196,10 @@ def test_app_create_pdf_captures_unique_report(monkeypatch, tmp_path, report_id)
     monkeypatch.setattr(detector_neumonia.pyautogui, "screenshot", lambda region: screenshot)
     monkeypatch.setattr(detector_neumonia.Image, "open", lambda path: Image.new("RGB", (3, 4), "black"))
     monkeypatch.setattr(detector_neumonia, "showinfo", lambda **_: None)
+
+    # Act
     app.create_pdf()
+
+    # Assert
     assert app.reportID == report_id + 1
     assert saved[0] == f"Reporte{report_id}.jpg"
