@@ -63,6 +63,7 @@ UAO-Neumonia-Grupo-7/
 ├── assets/
 │   └── flujo_datos.png
 ├── Dockerfile
+├── Makefile
 ├── pyproject.toml
 ├── uv.lock
 ├── .gitignore
@@ -157,6 +158,19 @@ uv run python -m src.detector_neumonia
 ```
 
 Para correr las pruebas unitarias o usar Docker, consulte las secciones "Pruebas unitarias" y "Dockerización" más abajo.
+
+## Uso con Makefile
+
+El proyecto incluye un `Makefile` con atajos para las tareas más comunes:
+
+| Comando | Acción |
+|---|---|
+| `make install` | Instala las dependencias con `uv` |
+| `make run` | Ejecuta la aplicación |
+| `make test` | Corre las pruebas unitarias |
+| `make docker-build` | Construye la imagen Docker |
+| `make docker-run` | Corre el contenedor Docker |
+| `make clean` | Elimina archivos generados (caché, entorno virtual, reportes) |
 
 ## Acerca del Modelo
 
